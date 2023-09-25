@@ -25,7 +25,6 @@ class Hello implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'message' => 'Esto se ejecuto a las ' . now()->format('H:i:s') . ' horas.',
         ];
     }
 
@@ -38,7 +37,6 @@ class Hello implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('channel'),
         ];
     }
 }

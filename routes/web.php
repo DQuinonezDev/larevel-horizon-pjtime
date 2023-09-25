@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\Hello;
+use App\Http\Controllers\TimeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,4 +16,4 @@ Route::get('/broadcast', function () {
 
 Route::get('/time', [TimeController::class, 'getTime']);
 Route::post('/time', [TimeController::class, 'setTime']);
-Route::post('/timezone', [TimeController::class, 'setTimezone']);
+Route::post('/timezone', [TimeController::class, 'setTimeZone']);
