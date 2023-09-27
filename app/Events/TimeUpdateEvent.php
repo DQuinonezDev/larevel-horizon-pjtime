@@ -9,34 +9,46 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Redis;
 
-class Hello implements ShouldBroadcast
+class TimeUpdateEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $time;
+    public $newTimeZone;
+    public $currentTime;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($time)
     {
-        //
-    }
+        $this->time = $time;
 
-    public function broadcastWith()
-    {
-        return [
-        ];
     }
-
 
     /**
      * Get the channels the event should broadcast on.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
+    {
+        Redis::rpush('timezone_change_messages', $this->time);
+
+        return new Channel('channel');
+    }
+
+    public function broadcastAs()
+    {
+        return 'time.saved';
+    }
+
+    public function broadcastWith()
     {
         return [
+            'newTimeZone' => $this->newTimeZone,
+            'currentTime' => $this->currentTime,
         ];
     }
 }

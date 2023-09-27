@@ -11,12 +11,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    { 
+        Redis::flushdb(); // Limpia la base de datos Redis (solo cuando este esta desarrollo)
 
         $currentTime = now()->toDateTimeString();
+        
         Redis::rpush('current_times', $currentTime);
+        Redis::rpush('current_times_aut', $currentTime);
 
-        Redis::rpush('timezones', 'UTC');
+        Redis::rpush('time_change', 'Primer mensaje en Redis');
+        Redis::rpush('timezone_change_messages', 'Primer mensaje en Redis');
+
+        Redis::rpush('timezones', 'UTC'); //Usa utc como predeterminado
     }
 
     /**
@@ -24,7 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Redis::del('current_times, timezones'); // Limpia la base de datos Redis (solo en desarrollo)
-
+        Redis::flushdb(); 
     }
 };

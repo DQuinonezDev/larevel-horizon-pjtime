@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'time',
-        'timezone'
+        'timezone',
+        'http://localhost:5173/*'
     ];
 }

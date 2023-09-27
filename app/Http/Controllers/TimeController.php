@@ -2,42 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Events\Hello;
+use App\Events\TimeUpdateEvent;
+use App\Events\TimeZoneChanged;
+use App\Events\TimeZoneChangedEvent;
+use App\Jobs\NotifyTimeZoneChangeJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
 class TimeController extends Controller
 {
-
     public function getTime()
     {
-        $timezone = Redis::get('timezone') ?: 'UTC';
-        $currentTime = Redis::get('current_time') ?: now()->toDateTimeString();
+        $timezone = Redis::lindex('timezones', -1) ?: 'UTC';
+        $currentTime = now()->setTimezone($timezone)->toDateTimeString();
 
-        return response()->json(['timezone_update' => $timezone, 'time_update' => $currentTime]);
+        // Redis::rpush('current_times_aut', $currentTime); 
+        // $message = "time update: $currentTime";
+
+
+        
+        // broadcast(new TimeUpdateEvent($message));
+
+        return response()->json(['timezone' => $timezone, 'current_time' => $currentTime]);
     }
+
 
 
     public function setTime(Request $request)
     {
-        $currentTime = now()->toDateTimeString();
-        Redis::rpush('current_times', $currentTime);
+        $newTimeZone = Redis::lindex('timezones', -1);
 
-        return response()->json(['message' => 'Nueva hora configurada correctamente']);
+        if ($newTimeZone) {
+            $currentTime = now()->setTimezone($newTimeZone)->toDateTimeString();
+            Redis::rpush('current_times', $currentTime);
+
+            return response()->json(['message' => 'Nueva hora configurada correctamente', 'current_time' => $currentTime]);
+        }
+
+        return response()->json(['error' => 'No se ha configurado un huso horario'], 400);
     }
+
 
 
 
     public function setTimeZone(Request $request)
     {
-
         $newTimeZone = $request->input('new_timezone');
 
-        Redis::rpush('timezones', $newTimeZone);
+        if ($newTimeZone) {
+            Redis::rpush('timezones', $newTimeZone);
 
-        $currentTime = now()->setTimezone($newTimeZone)->toDateTimeString();
-        Redis::rpush('current_times', $currentTime);
+            $currentTime = now()->setTimezone($newTimeZone)->toDateTimeString();
+            Redis::set('current_time', $currentTime);
 
-        return response()->json(['message' => 'Nuevo huso horario y hora configurados correctamente']);
+            // broadcast(new TimeZoneChanged($newTimeZone));
+            // broadcast(new Hello());
+            event(new TimeZoneChangedEvent($newTimeZone));
+
+            NotifyTimeZoneChangeJob::dispatch($newTimeZone);
+
+            return response()->json(['message' => 'Nuevo huso horario y hora configurados correctamente']);
+        }
+
+        return response()->json(['error' => 'Se requiere un nuevo huso horario'], 400);
     }
 }
