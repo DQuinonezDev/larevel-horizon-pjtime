@@ -15,8 +15,9 @@ return new class extends Migration
         Redis::flushdb(); // Limpia la base de datos Redis (solo cuando este esta desarrollo)
 
         $currentTime = now()->toDateTimeString();
-        
+
         Redis::rpush('current_times', $currentTime);
+        
         Redis::rpush('current_times_aut', $currentTime);
 
         Redis::rpush('time_change', 'Primer mensaje en Redis');

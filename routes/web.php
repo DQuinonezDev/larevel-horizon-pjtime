@@ -12,9 +12,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/broadcast', function () {
-    broadcast(new NuevoTiempo());
-});
-
 // Route::post('/time', [TimeController::class, 'setTime']);
 // Route::post('/timezone', [TimeController::class, 'setTimeZone']);

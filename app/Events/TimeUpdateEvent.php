@@ -26,12 +26,6 @@ class TimeUpdateEvent implements ShouldBroadcast
         $this->time = $time;
 
     }
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn()
     {
         Redis::rpush('time_change', $this->time);
