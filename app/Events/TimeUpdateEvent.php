@@ -34,7 +34,7 @@ class TimeUpdateEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        Redis::rpush('timezone_change_messages', $this->time);
+        Redis::rpush('time_change', $this->time);
 
         return new Channel('channel');
     }

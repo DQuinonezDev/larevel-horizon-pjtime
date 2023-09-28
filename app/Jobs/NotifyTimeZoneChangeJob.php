@@ -22,6 +22,6 @@ class NotifyTimeZoneChangeJob implements ShouldQueue
 
     public function handle()
     {
-        Redis::set('timezone_change_messages', "Se cambió el huso horario a {$this->newTimeZone}");
+        Redis::set('timezone_change_messages', " The Time zone change to: {$this->newTimeZone}");
     }
 }

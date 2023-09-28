@@ -20,5 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/time', [TimeController::class, 'getTime']);
+Route::get('/tzms', [TimeController::class, 'getTimeZoneMessages']);
+Route::get('/messages', [TimeController::class, 'getMessages']);
 Route::post('/time', [TimeController::class, 'setTime']);
 Route::post('/timezone', [TimeController::class, 'setTimeZone']);
